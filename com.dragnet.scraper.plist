@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Dragnet LaunchAgent.
+
+  Installed to ~/Library/LaunchAgents/com.dragnet.scraper.plist by
+  scripts/install_launchd.sh. The install script substitutes {{REPO_PATH}}
+  with the actual path before writing.
+
+  Runs at 07:30 and 17:30 local time. If the laptop is asleep at one of
+  those times, launchd runs it on next wake. RunAtLoad: false so it doesn't
+  fire when you `launchctl load` it (use --once for manual triggers).
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.dragnet.scraper</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{REPO_PATH}}/.venv/bin/python</string>
+        <string>-m</string>
+        <string>dragnet</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>{{REPO_PATH}}</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+    </dict>
+
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key>
+            <integer>7</integer>
+            <key>Minute</key>
+            <integer>30</integer>
+        </dict>
+        <dict>
+            <key>Hour</key>
+            <integer>17</integer>
+            <key>Minute</key>
+            <integer>30</integer>
+        </dict>
+    </array>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>{{REPO_PATH}}/dragnet.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>{{REPO_PATH}}/dragnet.err</string>
+
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

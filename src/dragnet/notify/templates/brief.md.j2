@@ -1,0 +1,53 @@
+---
+title: "Dragnet brief — {{ today }}"
+type: dragnet-brief
+date: {{ today }}
+total: {{ total }}
+tags: [dragnet, job-search]
+---
+
+# Dragnet brief — {{ today }}
+
+**{{ total }} new postings** since the last run.
+
+{% if total == 0 %}
+Nothing new today. Either the sources are quiet, dedup is working as intended, or both. Sanity-check `dragnet.log` if this persists for 3+ runs.
+{% else %}
+
+## Top postings
+
+{% for p in postings[:25] %}
+### {{ p.title }} — {{ p.company }}
+
+- **Score:** {{ p.score }} · **Source:** `{{ p.source }}`
+- **Location:** {{ p.location }}
+- **Signals:** {{ p.signals_summary() }}
+{% if p.matched_categories %}
+- **Categories:** {{ p.matched_categories | join(", ") }}
+{% endif %}
+{% if p.posted_at %}
+- **Posted:** {{ p.posted_at.strftime("%Y-%m-%d") }}
+{% endif %}
+{% if p.start_date_raw %}
+- **Start date language:** "{{ p.start_date_raw }}"
+{% endif %}
+- **URL:** [Apply]({{ p.url }})
+
+{% if p.description %}
+> {{ p.description[:400] | replace("\n", " ") }}{% if p.description | length > 400 %}…{% endif %}
+{% endif %}
+
+---
+
+{% endfor %}
+
+{% if postings | length > 25 %}
+*({{ postings | length - 25 }} more postings below the cutoff; raise the cap in config to see them.)*
+{% endif %}
+
+{% endif %}
+
+## Run notes
+
+- Brief generated at {{ today }}.
+- Adjust scoring/filtering in `config.yaml`; full log at `dragnet.log`.

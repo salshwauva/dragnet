@@ -1,0 +1,148 @@
+# Dragnet config. Copy to `config.yaml` (gitignored) and edit.
+
+# === Sources to enable ===
+# Toggle each on/off. Disabled sources are not called at all.
+sources:
+  usajobs: true       # Federal + cleared. Best signal for your citizenship advantage.
+  adzuna: true        # Broad US aggregator. 1000 calls/month free.
+  jsearch: true       # LinkedIn/Indeed/Glassdoor proxy via RapidAPI. 200 calls/month free.
+  remotive: true      # Remote tech only. No auth.
+  arbeitnow: true     # Tech jobs. No auth.
+  remoteok: true      # Remote. No auth.
+  hn_hiring: true     # HN "Who is Hiring" monthly thread.
+  themuse: true       # The Muse. Internship-level filter. No auth, no card.
+
+# === Keywords (OR'd together, then AND'd with intern detection) ===
+# Each category contributes to the "matched_categories" list per posting,
+# which feeds the category-match score component.
+categories:
+  embedded:
+    - embedded
+    - firmware
+    - rtos
+    - freertos
+    - zephyr
+    - microcontroller
+    - mcu
+    - fpga
+    - "hardware/software"
+    - "hw/sw"
+  swe:
+    - software engineer
+    - software engineering
+    - swe
+    - backend
+    - back-end
+    - frontend
+    - front-end
+    - full stack
+    - full-stack
+    - "platform engineer"
+  ml:
+    - machine learning
+    - "ml engineer"
+    - "ai engineer"
+    - deep learning
+    - llm
+    - "computer vision"
+    - nlp
+    - "applied ml"
+  cleared:
+    - cleared
+    - "security clearance"
+    - "secret clearance"
+    - "top secret"
+    - "ts/sci"
+    - polygraph
+    - "active clearance"
+  biotech:
+    - bioinformatics
+    - "computational biology"
+    - biotech
+    - genomics
+    - "drug discovery"
+    - "computational chemistry"
+  devops:
+    - devops
+    - sre
+    - "site reliability"
+    - "platform engineering"
+    - kubernetes
+    - terraform
+    - "infrastructure engineer"
+  research:
+    - "research engineer"
+    - "research scientist"
+    - "research intern"
+    - "applied research"
+
+# Bonus multiplier per category when matched. Crank a category up to
+# bubble its postings to the top.
+category_weights:
+  embedded: 1.0
+  swe: 1.0
+  ml: 1.0
+  cleared: 1.0
+  biotech: 1.0
+  devops: 1.0
+  research: 1.0
+
+# === Filter thresholds ===
+filters:
+  intern_required: true              # exclude if no intern signal at all
+  earliest_start: "2026-08-01"       # YYYY-MM-DD. Postings with explicit earlier-only language are dropped.
+  drop_summer_2026: true             # exclude if posting explicitly says "Summer 2026 only"
+  drop_spring_only: false            # set true to also drop Spring-only postings
+
+# === Scoring weights ===
+# Composite score = sum of these contributions.
+score:
+  # Location weights. Postings with multiple matches take the max.
+  location:
+    remote: 100
+    hybrid: 80
+    boston: 70           # Boston, Cambridge, Somerville, Waltham, MetroWest towns
+    dc: 50               # DC, Arlington, Reston, Fairfax, Bethesda
+    nyc: 40              # NYC, Brooklyn, Manhattan, Jersey City
+    philly: 35           # Philadelphia, Conshohocken, King of Prussia
+    chicago: 30
+    other_us: 10
+    international: 0
+  # Recency: score = max(0, 50 - days_since_posted * recency_decay)
+  recency_decay: 2.0
+  # Category match: this many points per distinct category matched.
+  category_match: 25
+  # Citizenship/clearance bonus (you're a US citizen, so these are an edge).
+  citizenship_bonus: 20      # added if posting requires US citizenship
+  clearance_bonus: 30        # added if posting mentions security clearance
+
+# === Notification settings ===
+notify:
+  # Where to write the daily markdown brief.
+  obsidian_brief_dir: "Tech/job-search/dragnet-briefs"
+  # Email digest settings.
+  email_enabled: true
+  email_to: "your.address@gmail.com"
+  email_from: "your.address@gmail.com"
+  # Only include postings with score >= this threshold in the email.
+  email_min_score: 50
+  # Cap the email digest at this many postings (top by score).
+  email_max_postings: 25
+
+# === Adapter behavior ===
+adapters:
+  concurrent_limit: 5            # max adapters running at once
+  per_adapter_timeout_sec: 30
+  # Adzuna: pages to fetch. Each page = 50 results.
+  adzuna_pages: 2
+  # JSearch: pages to fetch. Each page = 10 results. Watch your monthly quota.
+  jsearch_pages: 1
+  # The Muse: pages to fetch. Each page = 20 results. No quota; unauth = 500/hr.
+  themuse_pages: 3
+  # USAJobs: page size up to 500. Keep it generous; you only burn calls, not quota.
+  usajobs_page_size: 250
+
+# === Paths (rarely need to change) ===
+paths:
+  db_path: "./dragnet.db"
+  log_path: "./dragnet.log"
