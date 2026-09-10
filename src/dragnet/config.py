@@ -66,6 +66,7 @@ class LifecycleConfig(BaseModel):
 class PathsConfig(BaseModel):
     db_path: str = "./dragnet.db"
     log_path: str = "./dragnet.log"
+    vault_root: str = ""  # empty: autodetect
 
 
 class Secrets(BaseModel):
@@ -123,6 +124,7 @@ def _load_secrets() -> Secrets:
 def _detect_vault_root() -> Path | None:
     """Best-effort detection of Sophia's Obsidian vault root. Returns None if not found."""
     candidates = [
+        Path.home() / "my-vault",
         Path.home() / "Library/Mobile Documents/iCloud~md~obsidian/Documents/my-vault",
     ]
     for c in candidates:
@@ -139,5 +141,8 @@ def load_config(repo_root: Path | None = None) -> Config:
     cfg = Config(**raw)
     cfg.secrets = _load_secrets()
     cfg.repo_root = root
-    cfg.vault_root = _detect_vault_root()
+    if cfg.paths.vault_root:
+        cfg.vault_root = Path(cfg.paths.vault_root).expanduser()
+    else:
+        cfg.vault_root = _detect_vault_root()
     return cfg

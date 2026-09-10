@@ -146,6 +146,7 @@ adapters:
 paths:
   db_path: "./dragnet.db"
   log_path: "./dragnet.log"
+  vault_root: ""                 # Obsidian vault. Empty = autodetect (~/my-vault, then iCloud).
 
 # === Posting lifecycle ===
 # A posting that is absent from this many consecutive successful crawls of its
