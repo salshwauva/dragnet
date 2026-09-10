@@ -57,6 +57,12 @@ class AdaptersConfig(BaseModel):
     usajobs_page_size: int = 250
 
 
+class LifecycleConfig(BaseModel):
+    # A posting missing from this many consecutive successful crawls of its
+    # source is marked inactive. One miss is noise (rate limits, paging).
+    inactive_after_misses: int = 3
+
+
 class PathsConfig(BaseModel):
     db_path: str = "./dragnet.db"
     log_path: str = "./dragnet.log"
@@ -85,6 +91,7 @@ class Config(BaseModel):
     notify: NotifyConfig = Field(default_factory=NotifyConfig)
     adapters: AdaptersConfig = Field(default_factory=AdaptersConfig)
     paths: PathsConfig = Field(default_factory=PathsConfig)
+    lifecycle: LifecycleConfig = Field(default_factory=LifecycleConfig)
 
     # filled in post-load
     secrets: Secrets = Field(default_factory=Secrets)

@@ -1,12 +1,42 @@
+# Assistant and editor tooling. Keep every trace out of the public repo.
 CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+.claude/
+.claude-flow/
+.cursor/
+.cursorrules
+.cursorignore
+.windsurfrules
+.windsurf/
+.aider*
+.copilot/
+.github/copilot-instructions.md
+.codeium/
+.continue/
+.roo/
+.clinerules
+.mcp.json
+mcp.json
 docs/learning-log.md
+docs/plans/
+*.prompt.md
+
+# Secrets and local config
 .env
+config.yaml
+
+# Data and logs
 *.db
 *.db-journal
-config.yaml
+*.db-wal
+*.db-shm
 *.log
 *.err
+data/
 
+# Python
 __pycache__/
 *.pyc
 .venv/
@@ -14,7 +44,17 @@ venv/
 dist/
 build/
 *.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+pytest-cache-files-*/
 
+# Frontend
+node_modules/
+frontend/dist/
+frontend/coverage/
+
+# OS and IDE
 .DS_Store
 .idea/
 .vscode/

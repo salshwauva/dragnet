@@ -67,7 +67,7 @@ Once a day (e.g. with morning coffee), open the labels and triage:
 4. Then `Jobs/Alerts/Primes` — slow cadence, scan for new programs.
 5. Skim `Jobs/Alerts/LinkedIn` last — high volume, lower signal-per-email.
 
-For any role you want to apply to: hand it to the `job-apps` skill in Claude. That skill drafts the cover letter and CV tweaks, then hands off to `job-app-tracker` which logs the application in your vault.
+For any role you want to apply to: draft the cover letter and CV tweaks, then log the application in your vault.
 
 ## Maintenance
 
