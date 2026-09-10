@@ -1,8 +1,9 @@
 """SQLite store for seen-postings, posting lifecycle, and lightweight run history.
 
 Schema: `postings(fingerprint TEXT PRIMARY KEY, first_seen, last_seen, source, title,
-company, url, score, full_text, status, closed_at, missed_runs)` plus
-`runs(id, ran_at, total, new_postings)` for operational sanity checks.
+company, url, score, full_text, status, closed_at, missed_runs)`,
+`skills(id, name, category)` and `posting_skills(fingerprint, skill_id)` for extracted
+skills, plus `runs(id, ran_at, total, new_postings)` for operational sanity checks.
 
 Lifecycle: a row is `active` while its source keeps returning it. Each successful
 crawl of a source that omits the row bumps `missed_runs`; once that reaches the
@@ -36,6 +37,17 @@ CREATE TABLE IF NOT EXISTS postings (
     missed_runs INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_postings_last_seen ON postings(last_seen);
+CREATE TABLE IF NOT EXISTS skills (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    category TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS posting_skills (
+    fingerprint TEXT NOT NULL REFERENCES postings(fingerprint),
+    skill_id INTEGER NOT NULL REFERENCES skills(id),
+    UNIQUE(fingerprint, skill_id)
+);
+CREATE INDEX IF NOT EXISTS idx_posting_skills_skill ON posting_skills(skill_id);
 CREATE TABLE IF NOT EXISTS runs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ran_at TEXT NOT NULL,
@@ -208,6 +220,32 @@ class SeenStore:
         )
         self.conn.commit()
         return cur.rowcount
+
+    def save_skills(self, skills_by_posting: dict[str, list[tuple[str, str]]]) -> None:
+        """Replace each posting's skill set with the given (name, category) pairs.
+
+        A rerun with a changed vocabulary drops stale rows and adds new ones, so the
+        join table always mirrors the current extractor output.
+        """
+        for fingerprint, pairs in skills_by_posting.items():
+            self.conn.executemany(
+                "INSERT OR IGNORE INTO skills (name, category) VALUES (?, ?)", pairs
+            )
+            self.conn.execute("DELETE FROM posting_skills WHERE fingerprint = ?", (fingerprint,))
+            self.conn.executemany(
+                """INSERT OR IGNORE INTO posting_skills (fingerprint, skill_id)
+                   SELECT ?, id FROM skills WHERE name = ?""",
+                [(fingerprint, name) for name, _ in pairs],
+            )
+        self.conn.commit()
+
+    def skills_for(self, fingerprint: str) -> list[str]:
+        rows = self.conn.execute(
+            """SELECT s.name FROM posting_skills ps JOIN skills s ON s.id = ps.skill_id
+               WHERE ps.fingerprint = ? ORDER BY s.name""",
+            (fingerprint,),
+        ).fetchall()
+        return [str(r[0]) for r in rows]
 
     def record_run(self, total: int, new_count: int) -> None:
         self.conn.execute(

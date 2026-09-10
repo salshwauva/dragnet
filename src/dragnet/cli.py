@@ -15,6 +15,7 @@ from dragnet.pipeline.dedupe import split_new
 from dragnet.pipeline.filters import annotate_and_filter
 from dragnet.pipeline.orchestrator import fetch_all
 from dragnet.pipeline.score import score_all
+from dragnet.pipeline.skills import extract_all
 from dragnet.storage import SeenStore
 
 log = logging.getLogger("dragnet")
@@ -67,6 +68,7 @@ async def _run_once(cfg: Config, *, dry_run: bool, smoke: bool) -> int:
 
         # Always persist all postings (new and seen — seen refreshes last_seen).
         store.upsert_many(scored)
+        store.save_skills(extract_all(scored))
         closed = store.mark_absent(
             observed={p.fingerprint for p in scored},
             sources=fetched.succeeded,
