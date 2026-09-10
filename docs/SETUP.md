@@ -7,7 +7,7 @@ End-to-end install: ~45 minutes including the three free-tier API registrations.
 - macOS 14+ on Apple Silicon (the launchd plist and scripts assume this).
 - Python 3.12+ (`python3 --version` to check; if missing, install via `brew install python@3.12`).
 - A Gmail account with **2FA enabled** (the digest sender; can be the same as your main account).
-- Obsidian vault at `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/my-vault` (autodetected; override in `config.py` if elsewhere).
+- Obsidian vault at `~/my-vault` or the iCloud vault path (autodetected; set `paths.vault_root` in `config.yaml` if elsewhere).
 
 ## 1. Register at the three free-tier API providers
 
@@ -125,6 +125,6 @@ See `GMAIL_FILTERS.md` and `LAYER1_NATIVE_ALERTS.md`. Do these in one Saturday-m
 
 **No email arrives but no error in logs.** Check `notify.email_enabled: true` and that `notify.email_min_score` isn't filtering everything out (default 50 — lower if your first run has nothing above it).
 
-**`vault_root not detected`.** Open `src/dragnet/config.py` and edit `_detect_vault_root()` to add your path.
+**`vault_root not detected`.** Set `paths.vault_root` in `config.yaml` to your vault folder.
 
 **launchd doesn't fire.** `launchctl list | grep dragnet` to confirm it's loaded. `tail -f dragnet.log dragnet.err` while waiting for the next scheduled run.
