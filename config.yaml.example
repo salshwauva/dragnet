@@ -146,3 +146,9 @@ adapters:
 paths:
   db_path: "./dragnet.db"
   log_path: "./dragnet.log"
+
+# === Posting lifecycle ===
+# A posting that is absent from this many consecutive successful crawls of its
+# source is marked inactive. A single miss is treated as noise.
+lifecycle:
+  inactive_after_misses: 3

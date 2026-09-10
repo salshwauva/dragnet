@@ -44,10 +44,10 @@ def _build_query(cfg: Config) -> AdapterQuery:
 
 async def _run_once(cfg: Config, *, dry_run: bool, smoke: bool) -> int:
     query = _build_query(cfg)
-    raw = await fetch_all(cfg, query)
-    log.info("fetched %d raw postings", len(raw))
+    fetched = await fetch_all(cfg, query)
+    log.info("fetched %d raw postings", len(fetched.postings))
 
-    survivors = annotate_and_filter(raw, cfg)
+    survivors = annotate_and_filter(fetched.postings, cfg)
     log.info("after filter: %d survivors", len(survivors))
 
     scored = score_all(survivors, cfg)
@@ -68,6 +68,12 @@ async def _run_once(cfg: Config, *, dry_run: bool, smoke: bool) -> int:
 
         # Always persist all postings (new and seen — seen refreshes last_seen).
         store.upsert_many(scored)
+        closed = store.mark_absent(
+            observed={p.fingerprint for p in scored},
+            sources=fetched.succeeded,
+            threshold=cfg.lifecycle.inactive_after_misses,
+        )
+        log.info("lifecycle: %d postings marked inactive", closed)
         store.record_run(total=len(scored), new_count=len(new))
 
         # Write the brief. Always — even an empty brief is informative.
