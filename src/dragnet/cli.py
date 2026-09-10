@@ -37,8 +37,7 @@ def _build_query(cfg: Config) -> AdapterQuery:
     for kws in cfg.categories.values():
         flat.extend(kws)
     # Deduplicate while preserving order.
-    seen: set[str] = set()
-    unique = [k for k in flat if not (k in seen or seen.add(k))]
+    unique = list(dict.fromkeys(flat))
     return AdapterQuery(keywords=unique, intern_only=cfg.filters.intern_required)
 
 

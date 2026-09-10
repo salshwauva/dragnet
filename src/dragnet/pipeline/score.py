@@ -60,7 +60,7 @@ def location_score(post: Posting, cfg: Config) -> float:
     loc = post.location or ""
     for pattern, bucket in _LOCATION_PATTERNS:
         if pattern.search(loc):
-            return getattr(weights, bucket)
+            return float(getattr(weights, bucket))
     # Final fallback: assume US (most sources are US-only) unless explicit non-US.
     lower = loc.lower()
     non_us_markers = (

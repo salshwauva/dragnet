@@ -129,10 +129,12 @@ class SeenStore:
 
     def count(self, status: str | None = None) -> int:
         if status is None:
-            return self.conn.execute("SELECT COUNT(*) FROM postings").fetchone()[0]
-        return self.conn.execute(
-            "SELECT COUNT(*) FROM postings WHERE status = ?", (status,)
-        ).fetchone()[0]
+            row = self.conn.execute("SELECT COUNT(*) FROM postings").fetchone()
+        else:
+            row = self.conn.execute(
+                "SELECT COUNT(*) FROM postings WHERE status = ?", (status,)
+            ).fetchone()
+        return int(row[0])
 
     def upsert_many(self, postings: list[Posting]) -> None:
         """Insert new postings or refresh already-seen ones.
