@@ -1,6 +1,7 @@
 """Posting lifecycle: first/last seen, absence counting, inactive detection."""
 
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -10,7 +11,7 @@ from dragnet.storage import SeenStore
 
 
 def _p(source: str = "usajobs", title: str = "Software Intern", **kw) -> Posting:
-    base = dict(
+    base: dict[str, Any] = dict(
         source=source,
         source_id="1",
         url="https://x",

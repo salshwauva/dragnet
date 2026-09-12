@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from dragnet.config import Config
 from dragnet.models import Posting
@@ -18,7 +19,9 @@ def _cfg() -> Config:
 
 
 def _p(**kwargs) -> Posting:
-    base = dict(source="t", source_id="1", url="https://x", title="T", company="C", location="")
+    base: dict[str, Any] = dict(
+        source="t", source_id="1", url="https://x", title="T", company="C", location=""
+    )
     base.update(kwargs)
     return Posting(**base)
 

@@ -106,7 +106,8 @@ def _load_yaml(path: Path) -> dict[str, Any]:
             f"config.yaml not found at {path}. Copy config.yaml.example to config.yaml and edit."
         )
     with path.open() as f:
-        return yaml.safe_load(f)
+        data: dict[str, Any] = yaml.safe_load(f)
+    return data
 
 
 def _load_secrets() -> Secrets:

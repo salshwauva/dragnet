@@ -1,5 +1,6 @@
 import tempfile
 from pathlib import Path
+from typing import Any
 
 from dragnet.models import Posting
 from dragnet.pipeline.dedupe import fingerprint, split_new
@@ -7,7 +8,7 @@ from dragnet.storage import SeenStore
 
 
 def _p(**kw) -> Posting:
-    base = dict(
+    base: dict[str, Any] = dict(
         source="usajobs",
         source_id="1",
         url="https://x",

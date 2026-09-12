@@ -56,7 +56,7 @@ The script:
 ## 3. Configure
 
 ```bash
-cd /Users/sophia/projects/dragnet
+cd ~/dragnet
 cp .env.example .env
 cp config.yaml.example config.yaml
 ```
@@ -78,7 +78,7 @@ This fetches, filters, scores, dedupes, and writes the brief — but skips the e
 INFO dragnet.adapters.usajobs: adapter=usajobs status=ok count=180
 INFO dragnet.adapters.adzuna: adapter=adzuna status=ok count=72
 ...
-INFO dragnet: wrote brief: /Users/sophia/.../Tech/job-search/dragnet-briefs/2026-05-23.md
+INFO dragnet: wrote brief: ~/vault/Tech/job-search/dragnet-briefs/2026-05-23.md
 ```
 
 Open the brief in Obsidian. If you see postings, Layer 2 is working.
